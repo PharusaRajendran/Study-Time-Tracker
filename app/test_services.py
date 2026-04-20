@@ -1,16 +1,18 @@
-from services import save_study_entry
+from services import create_entry, get_entries, get_total_minutes
 
-save_study_entry(1, 60)
+#Create test entries
+create_entry(1, 60)
+create_entry(1, 30)
 
-print("It worked!")
 
-from services import save_study_entry, get_all_entries
-
-save_study_entry(1, 60)
-
-entries = get_all_entries()
-
+# Get entries for module 1
+entries = get_entries(1)
+print("Entries for module 1:")
 for entry in entries:
     print(entry.id, entry.module_id, entry.duration_minutes)
 
-print("It worked!")
+# Get total minutes for user 1
+total = get_total_minutes(1)
+print("Total minutes:", total)
+
+print("Test completed successfully!")
