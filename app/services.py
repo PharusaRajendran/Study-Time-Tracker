@@ -1,20 +1,33 @@
-from database import SessionLocal
-from models import StudyEntry, User, Module
-import hashlib
 
-def save_study_entry(module_id: int, duration_minutes: int):
+from database import SessionLocal
+from models import StudyEntry, Module
+from sqlalchemy import func
+
+
+def create_entry(module_id: int, duration_minutes: int):
     with SessionLocal() as session:
         entry = StudyEntry(
             module_id=module_id,
             duration_minutes=duration_minutes
         )
         session.add(entry)
-        session.commit() 
+        session.commit()
 
-def get_all_entries():
+
+def get_entries(module_id: int):
     with SessionLocal() as session:
-        entries = session.query(StudyEntry).all()
-        return entries       
+        return session.query(StudyEntry).filter_by(module_id=module_id).all()
+
+
+def get_total_minutes(user_id: int):
+    with SessionLocal() as session:
+        total = (
+            session.query(func.sum(StudyEntry.duration_minutes))
+            .join(Module)
+            .filter(Module.user_id == user_id)
+            .scalar()
+        )
+        return total or 0       
 
 def create_user(username: str, password_hash: str):
     with SessionLocal() as session:
