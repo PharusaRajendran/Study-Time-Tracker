@@ -1,6 +1,7 @@
 
-from database import SessionLocal
-from models import StudyEntry, Module
+from app.database import SessionLocal
+from app.models import StudyEntry, Module, User
+import hashlib
 from sqlalchemy import func
 
 
