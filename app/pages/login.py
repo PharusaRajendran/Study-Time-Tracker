@@ -21,7 +21,7 @@ def login_page():
                 if user:
                     current_user["id"] = user.id
                     ui.notify("Login successful!", color="green")
-                    print("loginsfiosdfoidjd")
+                    ui.navigate.to('/entries')
                 else:
                     ui.notify("Invalid username or password", color="red")
 
