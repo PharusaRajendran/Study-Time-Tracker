@@ -18,6 +18,12 @@ def module_detail_page():
     if not user_id or not module_id:
         ui.navigate.to('/dashboard')
         return
+    
+    ui.button(
+    icon='arrow_back',
+    on_click=lambda: ui.navigate.to('/dashboard')
+    ).props('flat round') \
+    .classes('mb-4')
 
     modules = get_active_modules(user_id) + get_archived_modules(user_id)
 
@@ -45,20 +51,12 @@ def module_detail_page():
 
     with ui.row().classes('w-full h-screen justify-center items-start p-10'):
 
-        with ui.column().classes('w-1/2'):
+        with ui.card().classes('w-1/2 p-6 rounded-2xl shadow-lg'):
 
-            # 📚 Titel
-            ui.label(module['name']).classes('text-3xl font-bold')
+            ui.label(module['name']).classes('text-3xl font-bold mb-1')
 
-            # ⏱ Total Time
-            ui.label(f'{hours}h {minutes}min').classes('text-xl mb-4')
-
-            if goal:
-                progress = int((total_minutes / goal) * 100)
-
-                ui.label(f"🎯 Goal: {goal // 60}h").classes('text-lg')
-                ui.linear_progress(progress / 100).classes('w-full')
-                ui.label(f"{progress}% completed")
+            ui.label(f'Total Study Time: {hours}h {minutes}min') \
+                .classes('text-lg text-black-1000 mb-4')
 
             def start_timer():
                 start_time["value"] = time.time()
@@ -88,19 +86,46 @@ def module_detail_page():
 
             ui.timer(1, update_timer)
 
-            with ui.row().classes('items-center gap-3 mb-4'):
+            with ui.row().classes('items-center gap-4 mb-6'):
 
-                timer_label = ui.label("00:00").classes('text-2xl font-bold')
+                timer_label = ui.label("00:00") \
+                    .classes('text-3xl')
 
                 if not module['is_archived']:
-                    ui.button("Start", on_click=start_timer, color='green')
-                    ui.button("Stop", on_click=stop_timer, color='red')
+                    ui.button("Start", on_click=start_timer, color='green') \
+                        .classes('rounded-xl')
+                    ui.button("Stop", on_click=stop_timer, color='red') \
+                        .classes('rounded-xl')
                 else:
                     ui.button("Start", color='grey').props('disable')
                     ui.button("Stop", color='grey').props('disable')
 
 
-                start_time = {"value": None} 
+                start_time = {"value": None}
+
+            if goal:
+                progress = min(100, int((total_minutes / goal) * 100))
+
+
+                with ui.column():
+
+                    ui.label(f"🎯 Your goal is {goal // 60}h") \
+                        .classes('text-md font-semibold')
+
+                    ui.label(f"You’ve completed {progress}%") \
+                        .classes('text-sm text-black-600')
+
+                    # your custom progress bar (from before)
+                    with ui.row().classes('w-full h-3 bg-gray-300 rounded-full mt-2'):
+                        ui.row().style(f'width: {progress}%;') \
+                            .classes('h-3 bg-blue-500 rounded-full')
+
+                    if progress >= 100:
+                        message = "Goal reached 🎉"
+                    else:
+                        message = "Keep going 💪"
+
+                    ui.label(message).classes('text-xs text-gray-500 mt-1')
 
             def open_goal_dialog():
                 with ui.dialog() as dialog, ui.card():
@@ -122,22 +147,21 @@ def module_detail_page():
 
                 dialog.open()
 
-            ui.button("Set Goal", on_click=open_goal_dialog)
+            button = ui.button(
+                "Set Goal", on_click=open_goal_dialog
+            ).props('outline') \
+            .classes('mb-6 rounded-xl')
 
+            if module['is_archived']:
+                button.props('disable')
 
-
-            # 📊 Timeline Filter (placeholder)
+            # 📋 Entries
+            ui.label('All Entries').classes('text-xl mb-2')
             filter_select = ui.select(
                 ['All', 'Today', 'This week', 'This month'],
                 value='All'
             ).classes('w-40 mb-6')
-
-            # 📋 Entries
-            ui.label('All Entries').classes('text-xl mb-2')
             entries_container = ui.column()
-
-            if not module['entries']:
-                ui.label('No entries yet').classes('text-gray-500')
 
 
             def show_entries():
@@ -169,17 +193,22 @@ def module_detail_page():
                         ui.label("No entries").classes('text-gray-500')
 
                     for e in entries:
-                        with ui.row().classes('justify-between w-full mb-1'):
-                            ui.label(str(e['studied_at']).split(' ')[0])
-                            ui.label(f"{e['duration_minutes']} min")
-    
+
+                        with ui.row().classes('justify-between items-center'):
+
+                            with ui.column():
+                                ui.label(str(e['studied_at']).split(' ')[0]) \
+                                    .classes('text-sm')
+
+                            ui.label(f"{e['duration_minutes']} min") \
+                                .classes('text-lg font-bold text-blue-600')
+
             # 🗑 Delete Button
             def handle_delete():
                 delete_module(module['id'])
                 ui.notify("Module deleted", color="red")
                 ui.navigate.to('/dashboard')
 
-            ui.button("Delete Module", on_click=handle_delete, color='red').classes('mt-4')
 
             def handle_toggle():
                 if module['is_archived']:
@@ -191,10 +220,23 @@ def module_detail_page():
 
                 ui.navigate.to('/dashboard')
 
-            ui.button(
-                "Unarchive Module" if module['is_archived'] else "Archive Module",
-                on_click=handle_toggle
-            ).classes('mt-2')
+            with ui.row().classes('gap-2 mt-6'):
+
+                ui.button("Delete", on_click=handle_delete, color='red') \
+                    .classes('rounded-xl')
+
+                ui.button(
+                    "Unarchive" if module['is_archived'] else "Archive",
+                    on_click=handle_toggle
+                ).classes('rounded-xl bg-orange-500 text-white')
+
+                button = ui.button(
+                    '+ Add Entry',
+                    on_click=lambda: ui.navigate.to('/entries') 
+                ).classes('rounded-xl bg-black text-white')
+
+                if module['is_archived']:
+                    button.props('disable')
 
             filter_select.on('update:model-value', lambda e: show_entries()) 
             show_entries()

@@ -6,6 +6,12 @@ from nicegui import app
 @ui.page('/modules')
 def modules_page():
 
+    ui.button(
+    icon='arrow_back',
+    on_click=lambda: ui.navigate.to('/dashboard')
+    ).props('flat round') \
+    .classes('mb-4')
+
     ui.label("Create New Module").classes("text-2xl font-bold")
 
     module_name = ui.input(label="Name")

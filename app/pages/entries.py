@@ -7,6 +7,12 @@ from app.models import Module, StudyEntry
 @ui.page('/entries')
 def entries_page():
 
+    ui.button(
+    icon='arrow_back',
+    on_click=lambda: ui.navigate.to('/dashboard')
+    ).props('flat round') \
+    .classes('mb-4')
+
     def load_modules():
             user_id = app.storage.user.get('user_id')
 

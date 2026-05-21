@@ -1,4 +1,6 @@
 # app/pages/dashboard.py
+from sys import modules
+
 from nicegui import ui
 from app.services import get_active_modules
 from app.services import get_archived_modules
@@ -60,13 +62,14 @@ def dashboard_page():
                 if total > 0:
                     chart_data.append({
                         'value': total,
+                        'name': m['name'],
                         'itemStyle': {'color': m['color']}
                     })
 
 
             # 📊 Chart UI
             ui.echart({
-                'tooltip': {'trigger': 'item'},
+                'tooltip': {'trigger': 'item', 'formatter': '{b}: {c} min'},
                 'series': [
                     {
                         'type': 'pie',
@@ -76,6 +79,11 @@ def dashboard_page():
                         
                         'label': {'show': False},
                         'labelLine': {'show': False},
+
+                        'itemStyle': {
+                            'borderColor': '#ffffff',
+                            'borderWidth': 2
+}
                     }
                 ]
             }).classes('w-64 h-64')
@@ -113,10 +121,12 @@ def dashboard_page():
                     on_click=lambda: ui.navigate.to('/modules')
                 ).props('square color=primary')
 
+                is_disabled = len(modules) == 0 
+
                 ui.button(
                     '+ Add Entry',
                     on_click=lambda: ui.navigate.to('/entries')
-                ).props('square color=primary')
+                ).props(f'square color=primary {"disable" if is_disabled else ""}')
 
             # 📦 Archived Hinweis
             ui.label('Archived Modules').classes('text-xl mt-6')
