@@ -1,7 +1,6 @@
 from nicegui import ui
 from app.services import get_user
-
-current_user = {"id": None}
+from nicegui import app
 
 
 @ui.page('/')
@@ -19,9 +18,10 @@ def login_page():
                 user = get_user(username.value, password.value)
 
                 if user:
-                    current_user["id"] = user.id
+                    app.storage.user['user_id'] = user.id  
+                    app.storage.user['username'] = user.username 
                     ui.notify("Login successful!", color="green")
-                    ui.navigate.to('/entries')
+                    ui.navigate.to('/dashboard')
                 else:
                     ui.notify("Invalid username or password", color="red")
 

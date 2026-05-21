@@ -1,17 +1,25 @@
-from nicegui import ui
-from app.services import create_entry, get_entries
+from nicegui import app, ui
+from app.services import create_entry
 from app.database import SessionLocal
-from app.models import Module
+from app.models import Module, StudyEntry
 
 
 @ui.page('/entries')
 def entries_page():
 
     def load_modules():
-        with SessionLocal() as session:
-            modules = session.query(Module).all()
-            return {module.name: module.id for module in modules}
+            user_id = app.storage.user.get('user_id')
 
+            with SessionLocal() as session:
+                modules = (
+                    session.query(Module)
+                    .filter(Module.user_id == user_id)  
+                    .filter(Module.is_archived == False)  
+                    .all()
+                )
+
+            return {module.name: module.id for module in modules}
+    
     module_options = load_modules()
 
     ui.label("Add Study Entry").classes("text-2xl font-bold")
@@ -25,19 +33,15 @@ def entries_page():
 
     entries_container = ui.column()
 
-    def show_entries():
-        entries_container.clear()
-
-        if not module_dropdown.value:
-            return
-
-        module_id = module_options[module_dropdown.value]
-        entries = get_entries(module_id)
-
-        with entries_container:
-            ui.label("Entries:")
-            for entry in entries:
-                ui.label(f"{entry.duration_minutes} minutes")
+    def get_entries(module_id: int, user_id: int):
+        with SessionLocal() as session:
+            return (
+                session.query(StudyEntry)
+                .join(Module)
+                .filter(StudyEntry.module_id == module_id)
+                .filter(Module.user_id == user_id)
+                .all()
+            )
 
     def save_entry():
         if not module_dropdown.value or not minutes_input.value:
@@ -49,6 +53,8 @@ def entries_page():
 
         ui.notify("Saved!")
         minutes_input.value = None
-        show_entries()
+ 
+
+        ui.navigate.to('/dashboard')
 
     ui.button("Save Entry", on_click=save_entry)

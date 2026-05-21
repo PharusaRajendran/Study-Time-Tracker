@@ -1,5 +1,6 @@
 from nicegui import ui
 from app.services import create_module
+from nicegui import app
 
 
 @ui.page('/modules')
@@ -30,7 +31,7 @@ def modules_page():
             return
 
         create_module(
-            user_id=1,
+            user_id=app.storage.user.get('user_id'),
             name=module_name.value,
             color=color_options[module_color.value]
         )
@@ -40,4 +41,8 @@ def modules_page():
         module_name.value = ""
         module_color.value = "Blue"
 
+        ui.navigate.to('/dashboard')
+  
+
     ui.button("Create Module", on_click=save_module)
+

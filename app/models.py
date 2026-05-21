@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, Integer, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
@@ -23,6 +23,7 @@ class Module(Base):
     color: Mapped[str] = mapped_column(String(7))  # hex color e.g. "#A78BFA"
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    goal_minutes = Column(Integer, nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="modules")
     entries: Mapped[list["StudyEntry"]] = relationship(back_populates="module")

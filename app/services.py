@@ -160,6 +160,21 @@ def archive_module(module_id: int):
             session.refresh(module)
 
         return module
+    
+def unarchive_module(module_id: int):
+    with SessionLocal() as session:
+        module = session.query(Module).filter(Module.id == module_id).first()
+
+        if not module:
+            return None
+
+        if module.is_archived:
+            module.is_archived = False
+            session.commit()
+            session.refresh(module)
+
+        return module
+    
 
 def delete_module(module_id: int):
     """Delete the module and all its study entries.

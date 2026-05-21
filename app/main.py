@@ -7,7 +7,9 @@ import app.pages.login
 import app.pages.register
 import app.pages.entries
 import app.pages.modules
+import app.pages.dashboard
+import app.pages.module_detail
 
 init_db()
 
-ui.run()
+ui.run(storage_secret='my-secret-key')
