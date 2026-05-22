@@ -11,7 +11,7 @@ from app.services import (
 def test_create_module_and_add_entry():
     module = create_module(
         user_id=1,
-        name="Integration Module",
+        name="Maths",
         color="#5898ff"
     )
 
@@ -26,7 +26,7 @@ def test_create_module_and_add_entry():
 def test_multiple_entries_update_total_minutes():
     module = create_module(
         user_id=1,
-        name="Total Integration Module",
+        name="Maths",
         color="#4CAF50"
     )
 
@@ -41,7 +41,7 @@ def test_multiple_entries_update_total_minutes():
 def test_archive_module_removes_from_active_modules():
     module = create_module(
         user_id=1,
-        name="Archive Integration Module",
+        name="Maths",
         color="#F44336"
     )
 

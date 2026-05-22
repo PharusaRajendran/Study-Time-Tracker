@@ -16,10 +16,10 @@ def test_create_module():
     user_id = 1
 
     # Act
-    module = create_module(user_id, "Test Module", "#5898ff")
+    module = create_module(user_id, "Maths", "#5898ff")
 
     # Assert
-    assert module.name == "Test Module"
+    assert module.name == "Maths"
     assert module.color == "#5898ff"
     assert module.user_id == user_id
     assert module.is_archived is False
@@ -28,7 +28,7 @@ def test_create_module():
 # CREATE ENTRY
 def test_create_entry():
     # Arrange
-    module = create_module(1, "Entry Test Module", "#5898ff")
+    module = create_module(1, "Maths", "#5898ff")
 
     # Act
     create_entry(module.id, 60)
@@ -42,7 +42,7 @@ def test_create_entry():
 # GET ENTRIES
 def test_get_entries():
     # Arrange
-    module = create_module(1, "Get Entries Module", "#4CAF50")
+    module = create_module(1, "Maths", "#4CAF50")
 
     # Act
     create_entry(module.id, 30)
@@ -56,7 +56,7 @@ def test_get_entries():
 # ARCHIVE MODULE
 def test_archive_module():
     # Arrange
-    module = create_module(1, "Archive Test Module", "#9C27B0")
+    module = create_module(1, "Maths", "#9C27B0")
 
     # Act
     archived_module = archive_module(module.id)
@@ -69,7 +69,7 @@ def test_archive_module():
 def test_delete_module():
     # Arrange
     user_id = 888
-    module = create_module(user_id, "Delete Test Module", "#FF9800")
+    module = create_module(user_id, "Maths", "#FF9800")
 
     # Act
     result = delete_module(module.id)

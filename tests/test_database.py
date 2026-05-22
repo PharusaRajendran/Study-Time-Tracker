@@ -23,7 +23,7 @@ def test_database_saves_module():
     with SessionLocal() as session:
         module = Module(
             user_id=1,
-            name="DB Test Module",
+            name="Maths",
             color="#5898ff"
         )
 
@@ -31,10 +31,10 @@ def test_database_saves_module():
         session.commit()
         session.refresh(module)
 
-        saved_module = session.query(Module).filter_by(name="DB Test Module").first()
+        saved_module = session.query(Module).filter_by(name="Maths").first()
 
         assert saved_module is not None
-        assert saved_module.name == "DB Test Module"
+        assert saved_module.name == "Maths"
         assert saved_module.color == "#5898ff"
 
 
