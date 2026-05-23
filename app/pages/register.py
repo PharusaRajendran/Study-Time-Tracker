@@ -1,5 +1,5 @@
 from nicegui import ui
-from app.services import create_user
+from app.services import user_service
 import hashlib
 
 
@@ -21,9 +21,9 @@ def register_page():
 
                 password_hash = hashlib.sha256(password.value.encode()).hexdigest()
 
-                create_user(username.value, password_hash)
+                user_service.create_user(username.value, password_hash)
 
                 ui.notify('User created!', color='green')
-                ui.navigate.to('/')  # zurück zu login
+                ui.navigate.to('/') 
 
             ui.button('Register', on_click=handle_register)

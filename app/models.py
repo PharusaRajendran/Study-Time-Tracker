@@ -23,7 +23,7 @@ class Module(Base):
     color: Mapped[str] = mapped_column(String(7))  # hex color e.g. "#A78BFA"
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    goal_minutes = Column(Integer, nullable=True)
+    goal_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="modules")
     entries: Mapped[list["StudyEntry"]] = relationship(back_populates="module")

@@ -1,12 +1,12 @@
-# app/pages/module_detail.py
 from nicegui import ui
-from app.services import get_active_modules, archive_module, delete_module, get_archived_modules, unarchive_module
 from nicegui import app
 from datetime import datetime, timedelta
-from app.services import create_entry 
-import time 
+import time
+
 from app.database import SessionLocal
 from app.models import Module
+
+from app.services import module_service, study_entry_service
 
 
 @ui.page('/module-detail')
@@ -25,18 +25,15 @@ def module_detail_page():
     ).props('flat round') \
     .classes('mb-4')
 
-    modules = get_active_modules(user_id) + get_archived_modules(user_id)
+    modules = module_service.get_active_modules(user_id) + module_service.get_archived_modules(user_id)
 
-    start_time = None
-
-    # 🔍 finde aktuelles Modul
     module = next((m for m in modules if m['id'] == module_id), None)
 
     if not module:
         ui.label("Module not found")
         return
 
-    # 🔢 total time
+    # Calculate total study time
     total_minutes = sum(e['duration_minutes'] for e in module['entries'])
 
     with SessionLocal() as session:
@@ -58,6 +55,7 @@ def module_detail_page():
             ui.label(f'Total Study Time: {hours}h {minutes}min') \
                 .classes('text-lg text-black-1000 mb-4')
 
+            # Timer functionality
             def start_timer():
                 start_time["value"] = time.time()
 
@@ -69,7 +67,7 @@ def module_detail_page():
                 duration_seconds = int(time.time() - start_time["value"])
                 duration_minutes = max(1, duration_seconds // 60)
 
-                create_entry(module['id'], duration_minutes)
+                study_entry_service.create_entry(module['id'], duration_minutes)
 
                 ui.notify(f"{duration_minutes} min saved!", color="green")
 
@@ -103,6 +101,7 @@ def module_detail_page():
 
                 start_time = {"value": None}
 
+            # Goal progress section
             if goal:
                 progress = min(100, int((total_minutes / goal) * 100))
 
@@ -115,7 +114,7 @@ def module_detail_page():
                     ui.label(f"You’ve completed {progress}%") \
                         .classes('text-sm text-black-600')
 
-                    # your custom progress bar (from before)
+
                     with ui.row().classes('w-full h-3 bg-gray-300 rounded-full mt-2'):
                         ui.row().style(f'width: {progress}%;') \
                             .classes('h-3 bg-blue-500 rounded-full')
@@ -155,7 +154,7 @@ def module_detail_page():
             if module['is_archived']:
                 button.props('disable')
 
-            # 📋 Entries
+
             ui.label('All Entries').classes('text-xl mb-2')
             filter_select = ui.select(
                 ['All', 'Today', 'This week', 'This month'],
@@ -164,6 +163,7 @@ def module_detail_page():
             entries_container = ui.column()
 
 
+            # Filter study entries
             def show_entries():
                 entries_container.clear()
 
@@ -172,7 +172,7 @@ def module_detail_page():
 
                 entries = module['entries']
 
-                # 🔥 Filter direkt hier
+
                 if selected == 'Today':
                     entries = [e for e in entries if e['studied_at'].date() == now.date()]
 
@@ -187,7 +187,7 @@ def module_detail_page():
                         and e['studied_at'].year == now.year
                     ]
 
-                # 🔥 Anzeige
+
                 with entries_container:
                     if not entries:
                         ui.label("No entries").classes('text-gray-500')
@@ -203,19 +203,19 @@ def module_detail_page():
                             ui.label(f"{e['duration_minutes']} min") \
                                 .classes('text-lg font-bold text-blue-600')
 
-            # 🗑 Delete Button
+
             def handle_delete():
-                delete_module(module['id'])
+                module_service.delete_module(module['id'])
                 ui.notify("Module deleted", color="red")
                 ui.navigate.to('/dashboard')
 
 
             def handle_toggle():
                 if module['is_archived']:
-                    unarchive_module(module['id'])
+                    module_service.unarchive_module(module['id'])
                     ui.notify("Module unarchived", color="green")
                 else:
-                    archive_module(module['id'])
+                    module_service.archive_module(module['id'])
                     ui.notify("Module archived", color="orange")
 
                 ui.navigate.to('/dashboard')

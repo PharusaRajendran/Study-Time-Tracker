@@ -1,13 +1,8 @@
 from app.services import (
-    create_module,
-    create_entry,
-    get_entries,
-    get_total_minutes,
-    archive_module,
-    delete_module,
-    get_active_modules,
+    module_service,
+    study_entry_service,
+    ServiceError,
 )
-
 
 
 # CREATE MODULE
@@ -16,7 +11,11 @@ def test_create_module():
     user_id = 1
 
     # Act
-    module = create_module(user_id, "Maths", "#5898ff")
+    module = module_service.create_module(
+        user_id,
+        "Maths",
+        "#5898ff"
+    )
 
     # Assert
     assert module.name == "Maths"
@@ -28,11 +27,15 @@ def test_create_module():
 # CREATE ENTRY
 def test_create_entry():
     # Arrange
-    module = create_module(1, "Maths", "#5898ff")
+    module = module_service.create_module(
+        1,
+        "Maths",
+        "#5898ff"
+    )
 
     # Act
-    create_entry(module.id, 60)
-    entries = get_entries(module.id)
+    study_entry_service.create_entry(module.id, 60)
+    entries = study_entry_service.get_entries(module.id)
 
     # Assert
     assert len(entries) == 1
@@ -42,12 +45,16 @@ def test_create_entry():
 # GET ENTRIES
 def test_get_entries():
     # Arrange
-    module = create_module(1, "Maths", "#4CAF50")
+    module = module_service.create_module(
+        1,
+        "Maths",
+        "#4CAF50"
+    )
 
     # Act
-    create_entry(module.id, 30)
-    create_entry(module.id, 45)
-    entries = get_entries(module.id)
+    study_entry_service.create_entry(module.id, 30)
+    study_entry_service.create_entry(module.id, 45)
+    entries = study_entry_service.get_entries(module.id)
 
     # Assert
     assert len(entries) == 2
@@ -56,10 +63,14 @@ def test_get_entries():
 # ARCHIVE MODULE
 def test_archive_module():
     # Arrange
-    module = create_module(1, "Maths", "#9C27B0")
+    module = module_service.create_module(
+        1,
+        "Maths",
+        "#9C27B0"
+    )
 
     # Act
-    archived_module = archive_module(module.id)
+    archived_module = module_service.archive_module(module.id)
 
     # Assert
     assert archived_module.is_archived is True
@@ -69,22 +80,28 @@ def test_archive_module():
 def test_delete_module():
     # Arrange
     user_id = 888
-    module = create_module(user_id, "Maths", "#FF9800")
+
+    module = module_service.create_module(
+        user_id,
+        "Maths",
+        "#FF9800"
+    )
 
     # Act
-    result = delete_module(module.id)
-    modules = get_active_modules(user_id)
+    result = module_service.delete_module(module.id)
+    modules = module_service.get_active_modules(user_id)
 
     # Assert
     assert result is True
-    assert module.id not in [m.id for m in modules]
+    assert module.id not in [m["id"] for m in modules]
 
 
-# EDGE CASE 
-def test_create_entry_invalid_module():
+# EDGE CASE: INVALID DURATION
+def test_create_entry_invalid_duration():
     # Act & Assert
     try:
-        create_entry(None, 60)
+        study_entry_service.create_entry(1, 0)
         assert False
-    except Exception:
+
+    except ServiceError:
         assert True

@@ -1,5 +1,5 @@
 from nicegui import ui
-from app.services import create_module
+from app.services import module_service
 from nicegui import app
 
 
@@ -36,7 +36,7 @@ def modules_page():
             ui.notify("Enter module name")
             return
 
-        create_module(
+        module_service.create_module(
             user_id=app.storage.user.get('user_id'),
             name=module_name.value,
             color=color_options[module_color.value]

@@ -1,4 +1,3 @@
-# app/init_db.py
 from app.database import engine, Base, SessionLocal
 from app.models import User, Module, StudyEntry
 
@@ -6,7 +5,6 @@ def init_db():
     Base.metadata.create_all(engine)
 
     with SessionLocal() as session:
-        # check if user exists (verhindert doppelte inserts)
         existing_user = session.query(User).first()
         if existing_user:
             return
