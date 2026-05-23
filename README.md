@@ -22,14 +22,14 @@ The application allows users to:
 - store study data in a database
 - view past study history
 - track how much time has been spent on each module
+- set study goals per module
 
 ## Features
 
 - **Track Study Entries**: Start/stop timer or manual entry for precise logging
 - **Database persistence**: Store all entries reliably with module organization
-- **Study history**: Browse past entries, filter by date/module
-- **Time analytics**: Calculate total hours (daily, weekly, per module)
-- **Module management**: Organize entries by course/topic
+- **Study history**: Browse past entries, filter by date
+- **Time analytics**: Calculate total minutes per module
 - **Archive module**: Hide completed courses from active view while preserving data
 - **Set Goals**: Set goals for each module and track their progression
 
@@ -38,7 +38,7 @@ The application allows users to:
 ### 1. Track Study Time
 **As a student, I want to track my study time so that I can improve my productivity.**
 
-- **Inputs:** Start/stop buttons, module dropdown
+- **Inputs:** Start/stop buttons
 - **Outputs:** Live timer display, entry duration saved to database
 
 ### 2. Save Study Entries
@@ -62,14 +62,14 @@ The application allows users to:
 ### 5. Archive Modules
 **As a student, I want to archive old modules so I can organize my trackings.**
 
-- **Inputs:** Archive button next to module name
-- **Outputs:** Module moves to archived list, excluded from active dashboard/stats
+- **Inputs:** Archive button
+- **Outputs:** Module moves to archived list, excluded from active dashboard
 
 ### 6. Unarchive Modules
 **As a student, I want to unarchive old modules so that I can make them active again when I need them.**
 
-- **Inputs:** Unarchive button next to an archived module
-- **Outputs:** Module is restored to the active module list and included again in tracking/statistics
+- **Inputs:** Unarchive button inside archived module
+- **Outputs:** Module is restored to the active module list and included again in statistics
 
 ### 7. Delete Modules
 **As a student, I want to delete modules from the list of modules**
@@ -117,6 +117,8 @@ Use Case 6: Delete Module
 - MVC-style structure
 - Clear separation between pages, logic, and database
 - Business logic stays outside the UI
+- Object-oriented service architecture using dedicated service classes
+- Encapsulation of business logic through UserService, ModuleService, and StudyEntryService
 
 ### Design Patterns Used
 - **Model-View-Controller:** the app is split into pages, services, and models so each part has one job.
@@ -126,7 +128,7 @@ Use Case 6: Delete Module
 
 ![ER Diagram](docs/ER_diagram.png)
 
-The application uses **SQLAlchemy** to map domain objects to a SQLite database.
+The application uses **SQLAlchemy ORM** to map domain objects to a SQLite database.
 
 ### Entities
 - `User` 
@@ -162,6 +164,7 @@ All persistent data is handled through SQLAlchemy with a SQLite database. The pr
 - NiceGUI 
 - SQLAlchemy
 - SQLite
+- Pytest
 
 ### Libraries Used
 
@@ -177,30 +180,31 @@ All persistent data is handled through SQLAlchemy with a SQLite database. The pr
 ```text
 Study-Time-Tracker/
 ├── README.md
-└── docs/
-    └── ER_diagram.png
-    └── UI_showcase.png
-    └── UML_class_diagram.png
-    └── use_cases.png
-    └── wireframe_mockups.png
 └── app/
     ├── database.py
     ├── init_db.py
     ├── main.py
     ├── models.py
     ├── services.py
-    ├── requirements.txt
     └── pages/
+        ├── dashboard.py
         ├── entries.py
         ├── login.py
         ├── modules.py
         ├── module_detail.py
-        ├── dashboard.py
         └── register.py
+└── docs/
+    └── ER_diagram.png
+    └── UI_showcase.png
+    └── UML_class_diagram.png
+    └── use_cases.png
+    └── wireframe_mockups.png
 └── test/
+    ├── conftest.py
     ├── test_database.py
     ├── test_integration.py
     └── test_services.py
+└── requirements.txt
 
 ```
 
@@ -219,6 +223,7 @@ Study-Time-Tracker/
 - `app/pages/module_detail.py` – Page for entry histories, goals and timers.
 - `app/pages/dashboard.py` - Page for dashboard, overview of all modules and ring diagram.
 - `app/pages/dashboard.py` - Page for dashboard, overview of all modules and ring diagram.
+- `tests/conftest.py` – Shared pytest configuration and reusable test fixtures.
 - `tests/test_database.py` - Test cases for database.
 - `tests/test_intergation.py` - Integration tests.
 - `tests/test_services.py` - Unit tests.
@@ -228,7 +233,10 @@ Study-Time-Tracker/
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/PharusaRajendran/Study-Time-Tracker
+```
+
+```bash
 cd Study-Time-Tracker
 ```
 
@@ -236,6 +244,12 @@ cd Study-Time-Tracker
 
 ```bash
 pip install -r requirements.txt
+```
+
+or
+
+```bash
+pip3 install -r requirements.txt
 ```
 
 ### 3. Start the application
@@ -272,7 +286,7 @@ or
 python3 -m pytest
 ```
 
-
+---
 
 | Field                       | Details                                                                            |
 | --------------------------- | ---------------------------------------------------------------------------------- |
@@ -431,9 +445,9 @@ python3 -m pytest
 
 | Team Member | Responsibilities |
 |-------------|------------------|
-| **Alex** | README file<br>back-end user functions<br>back-end module functions<br>organisation and protocolling<br>test cases |
-| **Roda** | back-end entries<br>front-end modules<br>front-end entries<br>tests<br>README file foundation |
-| **Pharusa** | lead role<br>database<br>front-end login<br>front-end register<br>front-end dashboard<br>first mockups |
+| **Alex** | README file<br>user service logic<br>module service logic<br>organisation and protocolling<br>test cases |
+| **Roda** | entries service logic<br>modules UI<br>entries UI<br>tests<br>README file foundation<br> |
+| **Pharusa** | lead role<br>database<br>login UI<br>register UI<br>dashboard UI<br>module detail UI<br>first mockups |
 
 ## License
 
