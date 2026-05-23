@@ -30,11 +30,15 @@ def entries_page():
         label="Choose module"
     )
 
-    minutes_input = ui.number(label="Minutes studied", min=1)
+    minutes_input = ui.input(label="Minutes studied")
 
     def save_entry():
-        if not module_dropdown.value or not minutes_input.value:
+        if not module_dropdown.value:
             ui.notify("Fill everything", color="red")
+            return
+        
+        if not minutes_input.value.isdigit() or int(minutes_input.value) <= 0:
+            ui.notify("Only positive whole numbers are allowed", color="red")
             return
 
         module_id = module_options[module_dropdown.value]

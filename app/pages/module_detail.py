@@ -70,8 +70,8 @@ def module_detail_page():
                 study_entry_service.create_entry(module['id'], duration_minutes)
 
                 ui.notify(f"{duration_minutes} min saved!", color="green")
-
                 start_time["value"] = None
+                ui.navigate.to('/module-detail')
 
                 show_entries()  
 
@@ -128,9 +128,15 @@ def module_detail_page():
 
             def open_goal_dialog():
                 with ui.dialog() as dialog, ui.card():
-                    goal_input = ui.number(label="Goal (hours)", min=1)
+                    goal_input = ui.input(
+                        label="Goal (hours)",
+                    )
 
                     def save_goal():
+                        if not goal_input.value.isdigit() or int(goal_input.value) <= 0:
+                            ui.notify("Only positive whole numbers are allowed", color="red")
+                            return
+                        
                         minutes = int(goal_input.value) * 60
 
                         with SessionLocal() as session:
